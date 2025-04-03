@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦁 THE LION Trader</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        :root {
+            --primary: #e67e22;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --gold: #f1c40f;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+            color: var(--dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--warning));
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="rgba(255,255,255,0.1)"><path d="M30,15 Q50,5 70,15 Q95,25 85,45 Q95,65 70,75 Q50,85 30,75 Q5,65 15,45 Q5,25 30,15 Z"/></svg>');
+            opacity: 0.3;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            position: relative;
+            z-index: 1;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .signature {
+            font-style: italic;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 1rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .positive {
+            color: var(--success);
+        }
+        
+        .negative {
+            color: var(--danger);
+        }
+        
+        .neutral {
+            color: var(--primary);
+        }
+        
+        .progress-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--success), var(--warning), var(--danger));
+            opacity: 0.2;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), #27ae60);
+            width: 0%;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                          rgba(255,255,255,0.3) 0%, 
+                          rgba(255,255,255,0) 100%);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        button {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                          rgba(255,255,255,0.2) 0%, 
+                          rgba(255,255,255,0) 50%);
+            z-index: -1;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+        
+        button:hover::before {
+            opacity: 1;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-gain {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-loss {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .history-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .history-title {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--dark);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .history-title span {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            font-weight: normal;
+        }
+        
+        .history-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-time {
+            font-size: 0.8rem;
+            color: #95a5a6;
+        }
+        
+        .history-type {
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .history-gain {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--success);
+        }
+        
+        .history-loss {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--danger);
+        }
+        
+        .history-value {
+            font-weight: bold;
+        }
+        
+        .series-info {
+            margin-top: 20px;
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #2980b9;
+        }
+        
+        .series-info strong {
+            color: var(--dark);
+        }
+        
+        @media (max-width: 500px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🦁 THE LION Trader</h1>
+            <div class="signature">"À Dieu, source de toute inspiration – Mon courage, ma force."<br>Proverbes 28:1 "Le juste est intrépide comme un lion."</div>
+        </header>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Total Gains</h3>
+                <div class="stat-value positive" id="totalGains">0 pts</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Pertes</h3>
+                <div class="stat-value negative" id="totalLosses">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Points Actuels</h3>
+                <div class="stat-value positive" id="currentPoints">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Progression</h3>
+                <div class="stat-value neutral" id="progressPercent">0%</div>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-label">
+                <span>Votre parcours du lion</span>
+                <span id="progressText">0/100</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn-gain" id="btnGain">Gain (+10 pts)</button>
+            <button class="btn-loss" id="btnLoss">Perte</button>
+        </div>
+        
+        <div class="series-info">
+            Séries de pertes: <strong id="currentSeries">0</strong> (actuelle) | 
+            Plus longue série: <strong id="maxSeries">0</strong> | 
+            Total séries: <strong id="totalSeries">0</strong>
+        </div>
+        
+        <div class="history-container">
+            <h3 class="history-title">Historique <span id="historyCount">0 actions</span></h3>
+            <div id="historyList">
+                <!-- Les entrées seront ajoutées ici -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Éléments du DOM
+        const btnGain = document.getElementById('btnGain');
+        const btnLoss = document.getElementById('btnLoss');
+        const totalGainsElement = document.getElementById('totalGains');
+        const totalLossesElement = document.getElementById('totalLosses');
+        const currentPointsElement = document.getElementById('currentPoints');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercent = document.getElementById('progressPercent');
+        const progressText = document.getElementById('progressText');
+        const historyList = document.getElementById('historyList');
+        const historyCount = document.getElementById('historyCount');
+        const currentSeriesElement = document.getElementById('currentSeries');
+        const maxSeriesElement = document.getElementById('maxSeries');
+        const totalSeriesElement = document.getElementById('totalSeries');
+        
+        // Données
+        let totalGains = 0;
+        let totalLosses = 0;
+        let currentPoints = 0;
+        let progression = 0;
+        let history = [];
+        let currentSeries = 0;
+        let maxSeries = 0;
+        let totalSeries = 0;
+        let isCompleted = false;
+        
+        // Charger les données depuis le localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('lionTraderData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                totalGains = data.totalGains || 0;
+                totalLosses = data.totalLosses || 0;
+                currentPoints = data.currentPoints || 0;
+                progression = data.progression || 0;
+                history = data.history || [];
+                currentSeries = data.currentSeries || 0;
+                maxSeries = data.maxSeries || 0;
+                totalSeries = data.totalSeries || 0;
+                isCompleted = data.isCompleted || false;
+                
+                updateUI();
+                checkCompletion();
+            }
+        }
+        
+        // Sauvegarder les données dans le localStorage
+        function saveData() {
+            const data = {
+                totalGains,
+                totalLosses,
+                currentPoints,
+                progression,
+                history,
+                currentSeries,
+                maxSeries,
+                totalSeries,
+                isCompleted
+            };
+            localStorage.setItem('lionTraderData', JSON.stringify(data));
+        }
+        
+        // Mettre à jour l'interface
+        function updateUI() {
+            totalGainsElement.textContent = `${totalGains} pts`;
+            totalLossesElement.textContent = totalLosses;
+            currentPointsElement.textContent = currentPoints;
+            
+            progressFill.style.width = `${progression}%`;
+            progressPercent.textContent = `${progression}%`;
+            progressText.textContent = `${progression}/100`;
+            
+            // Mettre à jour les séries de pertes
+            currentSeriesElement.textContent = currentSeries;
+            maxSeriesElement.textContent = maxSeries;
+            totalSeriesElement.textContent = totalSeries;
+            
+            // Mettre à jour l'historique
+            historyList.innerHTML = '';
+            historyCount.textContent = `${history.length} action${history.length > 1 ? 's' : ''}`;
+            
+            history.slice().reverse().forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'history-time';
+                timeSpan.textContent = formatTime(item.timestamp);
+                
+                const typeSpan = document.createElement('span');
+                typeSpan.className = `history-type ${item.type === 'gain' ? 'history-gain' : 'history-loss'}`;
+                typeSpan.textContent = item.type === 'gain' ? `+${item.value} points` : `Perte`;
+                
+                div.appendChild(timeSpan);
+                div.appendChild(typeSpan);
+                
+                historyList.appendChild(div);
+            });
+        }
+        
+        // Formater l'heure
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        // Vérifier si la progression est complète
+        function checkCompletion() {
+            if (progression >= 100 && !isCompleted) {
+                isCompleted = true;
+                disableButtons();
+                
+                Swal.fire({
+                    title: 'Félicitations Lion! 🦁',
+                    html: `<div style="font-size:1.2rem">Vous avez atteint 100% de progression!</div>
+                           <div style="margin-top:20px; font-style:italic; color:#555">"À Dieu, source de toute inspiration – Mon courage, ma force."</div>
+                           <div style="margin-top:10px">Proverbes 28:1 "Le juste est intrépide comme un lion."</div>`,
+                    icon: 'success',
+                    confirmButtonColor: '#e67e22',
+                    background: '#fff',
+                    backdrop: `
+                        rgba(0,0,0,0.5)
+                        url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30,15 Q50,5 70,15 Q95,25 85,45 Q95,65 70,75 Q50,85 30,75 Q5,65 15,45 Q5,25 30,15 Z' fill='%23f1c40f' opacity='0.2'/%3E%3C/svg%3E")
+                        center top
+                        no-repeat
+                    `,
+                    confirmButtonText: 'Je suis un Lion!'
+                });
+            }
+        }
+        
+        // Désactiver les boutons
+        function disableButtons() {
+            btnGain.disabled = true;
+            btnLoss.disabled = true;
+            btnGain.style.opacity = '0.6';
+            btnLoss.style.opacity = '0.6';
+            btnGain.style.cursor = 'not-allowed';
+            btnLoss.style.cursor = 'not-allowed';
+        }
+        
+        // Félicitations à chaque 20%
+        function checkMilestone() {
+            if (progression > 0 && progression % 20 === 0) {
+                Swal.fire({
+                    title: `Bravo Lion! 🦁 ${progression}% atteint!`,
+                    html: `<div style="font-size:1.1rem">Vous progressez comme un vrai lion!</div>
+                           <div style="margin-top:15px; font-style:italic; color:#555">"À Dieu, source de toute inspiration – Mon courage, ma force."</div>
+                           <div style="margin-top:10px">Proverbes 28:1 "Le juste est intrépide comme un lion."</div>`,
+                    icon: 'info',
+                    confirmButtonColor: '#e67e22',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: '#fff',
+                    showConfirmButton: false
+                });
+            }
+        }
+        
+        // Ajouter un gain
+        function addGain() {
+            if (isCompleted) return;
+            
+            totalGains += 10;
+            currentPoints += 10;
+            progression += 1;
+            
+            // Réinitialiser la série de pertes
+            if (currentSeries > 0) {
+                currentSeries = 0;
+            }
+            
+            history.push({
+                type: 'gain',
+                value: 10,
+                timestamp: new Date().getTime()
+            });
+            
+            saveData();
+            updateUI();
+            checkMilestone();
+            checkCompletion();
+        }
+        
+        // Ajouter une perte
+        function addLoss() {
+            if (isCompleted) return;
+            
+            totalLosses += 1;
+            currentSeries += 1;
+            
+            // Mettre à jour la plus longue série
+            if (currentSeries > maxSeries) {
+                maxSeries = currentSeries;
+            }
+            
+            // Si c'est le début d'une nouvelle série
+            if (currentSeries === 1) {
+                totalSeries += 1;
+            }
+            
+            history.push({
+                type: 'loss',
+                value: 1,
+                timestamp: new Date().getTime()
+            });
+            
+            saveData();
+            updateUI();
+        }
+        
+        // Événements
+        btnGain.addEventListener('click', addGain);
+        btnLoss.addEventListener('click', addLoss);
+        
+        // Initialisation
+        loadData();
+    </script>
+</body>
+</html>
